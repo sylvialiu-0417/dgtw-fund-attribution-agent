@@ -1,0 +1,13 @@
+{
+  "source_authorized": true,
+  "metric_definition_confirmed": true,
+  "bm_basis": "adjusted",
+  "return_timing": "forward",
+  "formation_rule": "june",
+  "breakpoint_is_not_bse": 1,
+  "coverage_threshold": 0.8,
+  "max_rows": 10000,
+  "weight_unit": "fraction",
+  "return_unit": "fraction",
+  "size_unit": "CNY"
+}
