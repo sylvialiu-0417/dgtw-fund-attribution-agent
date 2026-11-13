@@ -101,7 +101,9 @@ def validate(raw, config):
 
     holdings = []
     seen = set()
+    date_formatted_returns = 0
     for row in raw["holdings"]:
+        date_formatted_returns += int(row.get("_excel_return_date_coercion", False))
         p = period(row["return_period"])
         d = holding_date(row["holding_date"])
         c = code(row["code"])
@@ -110,7 +112,7 @@ def validate(raw, config):
             raise DataError(f"Duplicate holding key {key}")
         seen.add(key)
         w = number(row["weight"], "weight")
-        if not 0 < w <= 1:
+        if not 0 <= w <= 1:
             raise DataError(f"Invalid weight for {key}: {w}")
         if date.fromisoformat(d) >= quarter_start(p):
             issues.append(f"Holding {c} dated {d} is not prior to return quarter {p}")
@@ -161,13 +163,20 @@ def validate(raw, config):
     for row in holdings:
         totals[row["return_period"]] += row["weight"]
     for p, total in totals.items():
+        if total <= 0:
+            issues.append(f"No positive disclosed weight in {p}")
         if total > 1.000001:
             issues.append(f"Disclosed weight exceeds 100% in {p}: {total:.6f}")
+    if date_formatted_returns:
+        issues.append(f"{date_formatted_returns} stock returns stored with Excel date format; confirm recovered serials")
     return {"holdings": holdings, "features": features, "breakpoints": breakpoints,
             "benchmark_returns": benchmarks, "issues": sorted(set(issues)),
+            "supplements_applied": raw.get("supplements_applied", []),
             "source_missing": {"feature_mom": sum(r["mom"] is None for r in features),
                                "feature_bm": sum(r["bm"] is None for r in features),
-                               "holding_return": sum(r["stock_return"] is None for r in holdings)}}
+                               "holding_return": sum(r["stock_return"] is None for r in holdings),
+                               "zero_weight": sum(r["weight"] == 0 for r in holdings),
+                               "date_formatted_return": date_formatted_returns}}
 
 
 def _choose_group(value, rows, group_key, bound_key):
@@ -219,8 +228,11 @@ def group_holdings(data, config):
     for holding in data["holdings"]:
         year = formation_year(holding["return_period"])
         feature = features.get((holding["code"], year))
-        classification = ({"status": "UNCLASSIFIABLE", "reason": "MISSING_FEATURE_ROW"}
-                          if feature is None else classify_one(feature, breaks[year], config["bm_basis"]))
+        if holding["weight"] == 0:
+            classification = {"status": "UNCLASSIFIABLE", "reason": "ZERO_WEIGHT"}
+        else:
+            classification = ({"status": "UNCLASSIFIABLE", "reason": "MISSING_FEATURE_ROW"}
+                              if feature is None else classify_one(feature, breaks[year], config["bm_basis"]))
         result.append({**holding, "formation_year": year, **classification})
     return result
 

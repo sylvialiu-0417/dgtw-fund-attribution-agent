@@ -1,0 +1,20 @@
+[
+  {
+    "coverage_of_disclosed": 0.9,
+    "covered_holdings": 2,
+    "covered_weight": 0.9,
+    "cs": 0.051,
+    "disclosed_weight": 1.0,
+    "holdings": 3,
+    "return_period": "2025-03"
+  },
+  {
+    "coverage_of_disclosed": 0.9,
+    "covered_holdings": 2,
+    "covered_weight": 0.9,
+    "cs": 0.034,
+    "disclosed_weight": 1.0,
+    "holdings": 3,
+    "return_period": "2025-06"
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "code": "000003",
+    "formation_year": 2024,
+    "holding_date": "2024-12-31",
+    "reason": "MISSING_MOM",
+    "return_period": "2025-03",
+    "status": "UNCLASSIFIABLE",
+    "stock_return": 0.08,
+    "weight": 0.1
+  },
+  {
+    "code": "000003",
+    "formation_year": 2024,
+    "holding_date": "2025-03-31",
+    "reason": "MISSING_MOM",
+    "return_period": "2025-06",
+    "status": "UNCLASSIFIABLE",
+    "stock_return": -0.02,
+    "weight": 0.1
+  }
+]

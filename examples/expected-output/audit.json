@@ -1,0 +1,10 @@
+{
+  "errors": [],
+  "excluded_rows": 2,
+  "minimum_coverage": 0.9,
+  "passed": true,
+  "quarters": 2,
+  "warnings": [
+    "2 holding-period rows excluded; consult exceptions.json"
+  ]
+}

@@ -38,7 +38,7 @@ class DGTWTests(unittest.TestCase):
 
     def test_boundary_equality_and_nonmonotone(self):
         data = self.data()
-        feature = {"size": 400, "bm": 0.6, "mom": 0.0}
+        feature = {"size": 400_000_000_000, "bm": 0.6, "mom": 0.0}
         result = classify_one(feature, data["breakpoints"], "adjusted")
         self.assertEqual((result["size_group"], result["bm_group"], result["mom_group"]), (2, 3, 3))
         broken = copy.deepcopy(data["breakpoints"])
@@ -87,6 +87,15 @@ class DGTWTests(unittest.TestCase):
                 handle.write("\n")
             with self.assertRaises(DataError):
                 advance(path)
+
+    def test_authorized_supplement_creates_complete_new_run(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = start(self.input_dir, self.input_dir / "config.json", temp,
+                         supplements_csv=self.input_dir / "supplements.csv")
+            self.assertEqual(read_json(path / "state.json")["status"], "COMPLETE")
+            self.assertEqual(read_json(path / "input.json")["source_missing"]["feature_mom"], 0)
+            self.assertEqual(len(read_json(path / "input.json")["supplements_applied"]), 1)
+            self.assertAlmostEqual(read_json(path / "quarterly.json")[0]["coverage_of_disclosed"], 1.0)
 
 
 if __name__ == "__main__":

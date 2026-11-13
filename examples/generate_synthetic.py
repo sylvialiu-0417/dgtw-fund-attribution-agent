@@ -27,9 +27,13 @@ for holding_date, period, returns in [
 table("holdings", ("holding_date", "return_period", "code", "weight", "stock_return"), holdings)
 
 table("features", ("code", "formation_year", "size", "bm", "mom"), [
-    dict(code="000001", formation_year=2024, size=450, bm=0.7, mom=0.35),
-    dict(code="000002", formation_year=2024, size=250, bm=0.3, mom=-0.1),
-    dict(code="000003", formation_year=2024, size=150, bm=0.5, mom=""),
+    dict(code="000001", formation_year=2024, size=450_000_000_000, bm=0.7, mom=0.35),
+    dict(code="000002", formation_year=2024, size=250_000_000_000, bm=0.3, mom=-0.1),
+    dict(code="000003", formation_year=2024, size=150_000_000_000, bm=0.5, mom=""),
+])
+table("supplements", ("code", "formation_year", "metric", "value", "source", "source_definition", "extracted_at"), [
+    dict(code="000003", formation_year=2024, metric="mom", value=0.1, source="synthetic fixture",
+         source_definition="Synthetic 12-minus-1 momentum at 2024-06-30", extracted_at="2026-11-13"),
 ])
 
 breakpoints = []
@@ -38,7 +42,7 @@ for size_group in range(1, 6):
         for mom_group in range(1, 6):
             breakpoints.append(dict(year=2024, size_group=size_group, bm_group=bm_group,
                                     mom_group=mom_group, is_not_bse=1,
-                                    size_max=600 - 100 * size_group,
+                                    size_max=(600 - 100 * size_group) * 1_000_000_000,
                                     adj_bm_max=1.2 - 0.2 * bm_group,
                                     raw_bm_max=1.2 - 0.2 * bm_group,
                                     mom_max=0.6 - 0.2 * mom_group))

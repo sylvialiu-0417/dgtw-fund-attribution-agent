@@ -15,6 +15,7 @@ def main(argv=None):
     run.add_argument("--holdings-xlsx")
     run.add_argument("--benchmark-xlsx")
     run.add_argument("--config", required=True)
+    run.add_argument("--supplements-csv", help="Authorized missing-feature backfill with provenance")
     run.add_argument("--runs-dir", required=True)
     run.add_argument("--stop-after", choices=("validated", "grouped", "calculated", "audited"))
     resume = sub.add_parser("resume", help="Resume an interrupted run after hash checks")
@@ -23,7 +24,7 @@ def main(argv=None):
     try:
         if args.command == "run":
             path = start(args.input_dir, args.config, args.runs_dir, args.holdings_xlsx,
-                         args.benchmark_xlsx, args.stop_after)
+                         args.benchmark_xlsx, args.stop_after, args.supplements_csv)
         else:
             path = advance(args.run_dir)
         state = read_json(path / "state.json")

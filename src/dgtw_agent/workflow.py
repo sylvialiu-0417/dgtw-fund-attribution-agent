@@ -11,7 +11,7 @@ from pathlib import Path
 from . import __version__
 from .audit import audit
 from .engine import DataError, calculate, group_holdings, validate
-from .io import load_csv_bundle, load_excel_pair
+from .io import apply_supplements, load_csv_bundle, load_excel_pair
 from .report import render
 
 
@@ -70,7 +70,8 @@ def _verify(run_dir, state):
     return manifest
 
 
-def start(input_dir, config_path, runs_dir, holdings_xlsx=None, benchmark_xlsx=None, stop_after=None):
+def start(input_dir, config_path, runs_dir, holdings_xlsx=None, benchmark_xlsx=None, stop_after=None,
+          supplements_csv=None):
     if stop_after and stop_after not in STAGES:
         raise ValueError("Invalid stop-after stage")
     input_dir = Path(input_dir).resolve() if input_dir else None
@@ -85,6 +86,9 @@ def start(input_dir, config_path, runs_dir, holdings_xlsx=None, benchmark_xlsx=N
             raise DataError("Provide --input-dir or both Excel workbooks")
         source_paths = [input_dir / f"{name}.csv" for name in ("holdings", "features", "breakpoints", "benchmark_returns")]
         source = {"kind": "csv", "path": str(input_dir)}
+    if supplements_csv:
+        source["supplements_csv"] = str(Path(supplements_csv).resolve())
+        source_paths.append(Path(supplements_csv).resolve())
     for path in [*source_paths, config_path]:
         if not path.is_file():
             raise DataError(f"Missing input file: {path}")
@@ -131,6 +135,8 @@ def advance(run_dir, stop_after=None):
             if stage == "validated":
                 source = state["source"]
                 raw = load_csv_bundle(source["path"]) if source["kind"] == "csv" else load_excel_pair(*source["paths"])
+                if source.get("supplements_csv"):
+                    raw = apply_supplements(raw, source["supplements_csv"])
                 data = validate(raw, config)
                 write_json(run_dir / "input.json", data)
                 _checkpoint(run_dir, state, stage, ["input.json"])
