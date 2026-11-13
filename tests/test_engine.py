@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from dgtw_agent.engine import DataError, calculate, classify_one, group_holdings, validate
+from dgtw_agent.audit import audit
 from dgtw_agent.io import load_csv_bundle
 from dgtw_agent.workflow import advance, read_json, start
 
@@ -53,6 +54,13 @@ class DGTWTests(unittest.TestCase):
         result = calculate(group_holdings(data, self.config), data)
         self.assertEqual(result["stock_rows"][0]["reason"], "MISSING_STOCK_RETURN")
         self.assertAlmostEqual(result["quarterly"][0]["covered_weight"], 0.4)
+
+    def test_independent_audit_rejects_tampered_contribution(self):
+        data = self.data()
+        grouped = group_holdings(data, self.config)
+        result = calculate(grouped, data)
+        result["stock_rows"][0]["contribution"] += 0.01
+        self.assertFalse(audit(data, grouped, result, self.config)["passed"])
 
     def test_duplicate_and_future_leakage(self):
         raw = load_csv_bundle(self.input_dir)
