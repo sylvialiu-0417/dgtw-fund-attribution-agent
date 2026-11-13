@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+.DS_Store
+private_data/
+private_runs/
+*.xlsx
+*.xls
+*.env
+config.toml
+*api_key*
+*.pem
+*.key
+*.zip
+

@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dgtw-fund-attribution-agent"
+version = "0.1.0"
+description = "Persistent DGTW fund-holdings characteristic attribution workflow"
+requires-python = ">=3.11"
+dependencies = ["openpyxl>=3.1,<4"]
+
+[project.optional-dependencies]
+dev = []
+
+[project.scripts]
+dgtw-agent = "dgtw_agent.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
